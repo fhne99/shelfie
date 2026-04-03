@@ -1,3 +1,60 @@
 spring:
   application:
     name: shelfie
+
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/shelfie}
+    username: ${DATABASE_USERNAME:shelfie}
+    password: ${DATABASE_PASSWORD:shelfie}
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+  mail:
+    host: ${MAIL_HOST:smtp.resend.com}
+    port: ${MAIL_PORT:465}
+    username: ${MAIL_USERNAME:resend}
+    password: ${MAIL_PASSWORD:}
+    protocol: smtps
+    properties:
+      mail:
+        smtp:
+          auth: true
+          ssl:
+            enable: true
+
+shelfie:
+  mail:
+    from: ${MAIL_FROM:noreply@shelfie.app}
+    base-url: ${BASE_URL:http://localhost:8080}
+  cloudinary:
+    cloud-name: ${CLOUDINARY_CLOUD_NAME:}
+    api-key: ${CLOUDINARY_API_KEY:}
+    api-secret: ${CLOUDINARY_API_SECRET:}
+  google-books:
+    api-key: ${GOOGLE_BOOKS_API_KEY:}
+  jwt:
+    secret: ${JWT_SECRET:dev-secret-key-change-in-production-must-be-very-long}
+    expiration: 86400000
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when-authorized
+
+server:
+  port: 8080
