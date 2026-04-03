@@ -1,0 +1,38 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: shelfie-postgres
+    environment:
+      POSTGRES_DB: shelfie
+      POSTGRES_USER: shelfie
+      POSTGRES_PASSWORD: shelfie
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U shelfie"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  sonarqube:
+    image: sonarqube:community
+    container_name: shelfie-sonarqube
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SONAR_JDBC_URL: jdbc:postgresql://postgres:5432/shelfie
+      SONAR_JDBC_USERNAME: shelfie
+      SONAR_JDBC_PASSWORD: shelfie
+    ports:
+      - "9000:9000"
+    volumes:
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_logs:/opt/sonarqube/logs
+
+volumes:
+  postgres_data:
+  sonarqube_data:
+  sonarqube_logs:
