@@ -1,5 +1,6 @@
 package com.projet.shelfie.infrastructure.config;
 
+import com.projet.shelfie.domain.port.out.TokenGeneratorPort;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -9,9 +10,10 @@ import org.springframework.stereotype.Service;
 import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.UUID;
+import java.time.Instant;
 
 @Service
-public class JwtService {
+public class JwtService implements TokenGeneratorPort {
 
     private final SecretKey secretKey;
     private final long expiration;
@@ -23,6 +25,7 @@ public class JwtService {
         this.expiration = expiration;
     }
 
+    @Override
     public String generateToken(UUID userId) {
         var jti = UUID.randomUUID().toString();
         return Jwts.builder()
@@ -34,18 +37,23 @@ public class JwtService {
                 .compact();
     }
 
+    @Override
     public String extractUserId(String token) {
         return parseClaims(token).getSubject();
     }
 
+    @Override
+    public Instant extractExpiration(String token) {
+        return parseClaims(token).getExpiration().toInstant();
+    }
+
+    @Override
     public String extractJti(String token) {
         return parseClaims(token).getId();
     }
 
-    public Date extractExpiration(String token) {
-        return parseClaims(token).getExpiration();
-    }
 
+    @Override
     public boolean isValid(String token) {
         try {
             parseClaims(token);

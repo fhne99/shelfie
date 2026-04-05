@@ -2,6 +2,7 @@ package com.projet.shelfie.application.usecase;
 
 import com.projet.shelfie.domain.exception.UnauthorizedException;
 import com.projet.shelfie.domain.port.in.LoginUseCase;
+import com.projet.shelfie.domain.port.out.TokenGeneratorPort;
 import com.projet.shelfie.domain.port.out.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -13,6 +14,7 @@ public class LoginUseCaseImpl implements LoginUseCase {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final TokenGeneratorPort tokenGeneratorPort;
 
     @Override
     public LoginResult login(LoginCommand command) {
@@ -27,8 +29,7 @@ public class LoginUseCaseImpl implements LoginUseCase {
             throw new UnauthorizedException("Invalid credentials");
         }
 
-        // Le token JWT sera généré par JwtService dans l'adaptateur web
-        // On retourne un résultat intermédiaire — le controller s'occupera du token
-        return new LoginResult("__pending__", 86400L);
+        var token = tokenGeneratorPort.generateToken(user.id());
+        return new LoginResult(token, 86400L);
     }
 }
